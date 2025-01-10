@@ -15,7 +15,7 @@ export default function Navbar() {
   const user = session?.user
 
   return (
-    <div className="bg-black">
+    <div className="bg-background">
       <div className="mx-auto w-full max-w-screen-xl flex items-center justify-between px-4 py-2">
         <div className="flex items-center">
           <Link to="/" className="font-bold">

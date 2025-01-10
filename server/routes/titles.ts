@@ -1,12 +1,14 @@
 import { Hono } from 'hono'
 import db from '../db/drizzle'
 import { title } from '../db/schema/title'
-import { and, eq, like, SQL } from 'drizzle-orm'
+import { and, eq, getTableColumns, like, SQL } from 'drizzle-orm'
 import { type } from '../db/schema/type'
 import { titleTag } from '../db/schema/title-tag'
 import { tag } from '../db/schema/tag'
 import { getAuthUser } from '@hono/auth-js'
 import { like as likes } from '../db/schema/like'
+
+const titleWithTypeColumns = { ...getTableColumns(title), typeName: type.name }
 
 export const titleRoute = new Hono()
   .get('/', async (c) => {
@@ -18,18 +20,11 @@ export const titleRoute = new Hono()
     if (tagName) filters.push(eq(tag.name, tagName))
 
     let query = db
-      .select({
-        id: title.id,
-        name: title.name,
-        typeId: title.typeId,
-        description: title.description,
-        imageUrl: title.imageUrl,
-        createdAt: title.createdAt,
-      })
+      .select(titleWithTypeColumns)
       .from(title)
       .where(and(...filters))
+      .innerJoin(type, eq(title.typeId, type.id))
 
-    if (typeName) query = query.innerJoin(type, eq(title.typeId, type.id))
     if (tagName)
       query = query
         .innerJoin(titleTag, eq(title.id, titleTag.titleId))
@@ -43,15 +38,9 @@ export const titleRoute = new Hono()
 
     if (user) {
       const titles = await db
-        .select({
-          id: title.id,
-          name: title.name,
-          typeId: title.typeId,
-          description: title.description,
-          imageUrl: title.imageUrl,
-          createdAt: title.createdAt,
-        })
+        .select(titleWithTypeColumns)
         .from(title)
+        .innerJoin(type, eq(title.typeId, type.id))
         .innerJoin(
           likes,
           and(eq(likes.userId, user.id), eq(title.id, likes.titleId))

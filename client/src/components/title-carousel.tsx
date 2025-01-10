@@ -7,11 +7,11 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from './ui/carousel'
-import { Title } from '@server/db/schema/title'
+import { TitleWithType } from '@server/db/schema/title'
 
 type Props = {
   name: string
-  titlesPromise: Promise<Title[]>
+  titlesPromise: Promise<TitleWithType[]>
 }
 
 export default function TitleCarousel({ name, titlesPromise }: Props) {
@@ -26,7 +26,7 @@ export default function TitleCarousel({ name, titlesPromise }: Props) {
       >
         <CarouselContent>
           {titles.map((title) => (
-            <CarouselItem className="basis-1/5">
+            <CarouselItem key={title.id} className="basis-[calc(100%/6.5)]">
               <TitleCard title={title} />
             </CarouselItem>
           ))}

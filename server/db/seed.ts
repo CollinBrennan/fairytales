@@ -24,10 +24,12 @@ async function seed() {
       name: 'name1',
       id: 'title1',
       typeId: 'type1',
-      imageUrl: 'https://i.imgur.com/Vj2zcfp.png',
+      coverUrl: 'https://i.imgur.com/Vj2zcfp.png',
+      trailerUrl:
+        'https://www.youtube.com/embed/4-MnhFSHTxU?si=beACAOaDjSZuaG3A',
     },
     {
-      name: 'name2',
+      name: 'REALLY REALLY LONG NAME FOR TESTING PURPOSES',
       id: 'title2',
       typeId: 'type2',
     },
@@ -40,31 +42,41 @@ async function seed() {
       name: 'name4',
       id: 'title4',
       typeId: 'type4',
-      imageUrl: 'https://i.imgur.com/FSXpm85.jpeg',
+      coverUrl: 'https://i.imgur.com/FSXpm85.jpeg',
     },
     {
       name: 'name10',
       id: 'title10',
       typeId: 'type4',
-      imageUrl: 'https://i.imgur.com/Vj2zcfp.png',
+      coverUrl: 'https://i.imgur.com/Vj2zcfp.png',
     },
     {
       name: 'name20',
       id: 'title20',
       typeId: 'type3',
-      imageUrl: 'https://i.imgur.com/FSXpm85.jpeg',
+      coverUrl: 'https://i.imgur.com/FSXpm85.jpeg',
     },
     {
       name: 'name30',
       id: 'title30',
       typeId: 'type2',
-      imageUrl: 'Invalid URL for testing',
+      coverUrl: 'Invalid URL for testing',
     },
     {
       name: 'name40',
       id: 'title40',
       typeId: 'type1',
-      imageUrl: 'https://i.imgur.com/Vj2zcfp.png',
+      coverUrl: 'https://i.imgur.com/Vj2zcfp.png',
+    },
+    {
+      name: 'REALLY REALLY LONG NAME FOR TESTING PURPOSES REALLY REALLY LONG NAME FOR TESTING PURPOSES REALLY REALLY LONG NAME FOR TESTING PURPOSES ',
+      id: 'title50',
+      typeId: 'type2',
+    },
+    {
+      name: 'Capitalized Name',
+      id: 'title51',
+      typeId: 'type1',
     },
   ])
 

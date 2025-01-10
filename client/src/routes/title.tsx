@@ -37,13 +37,13 @@ function TitleInfo({ titlePromise }: { titlePromise: Promise<Title> }) {
           <div className="flex-[3]">
             <img
               className="aspect-[2/3] object-cover"
-              src={title.imageUrl || ImageNotFound}
+              src={title.coverUrl || ImageNotFound}
               alt={title.name}
             />
           </div>
           <div className="flex-[8]">
             <video
-              src="https://videos.pexels.com/video-files/855029/855029-hd_1920_1080_30fps.mp4"
+              src="https://www.youtube.com/embed/4-MnhFSHTxU?si=beACAOaDjSZuaG3A"
               muted
               autoPlay
               controls
