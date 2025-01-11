@@ -40,11 +40,6 @@ function TitleInfo({
 
   return title ? (
     <div>
-      <h1 className="text-4xl font-bold pt-4">{title.name}</h1>
-      <div className="text-muted-foreground capitalize font-semibold">
-        {getYear(title.releaseDate)} {title.typeName}
-      </div>
-
       <div className="flex gap-4 pt-4">
         <div className="basis-1/4">
           <img
@@ -54,15 +49,22 @@ function TitleInfo({
           />
         </div>
         <div className="basis-3/4">
-          <div className="flex gap-1">
+          <h1 className="text-4xl font-bold">{title.name}</h1>
+          <div className="text-muted-foreground capitalize font-semibold">
+            {getYear(title.releaseDate)} {title.typeName}
+          </div>
+
+          <LikeButton titleId={title.id} />
+
+          <p className="pt-4">{title.description || 'No description.'}</p>
+
+          <div className="flex gap-1 pt-4">
             {title.tagNames.map((tagName) => (
               <Link key={tagName} to={`/browse?tag=${tagName}`}>
-                <Badge>{tagName}</Badge>
+                <Badge variant="secondary">{tagName}</Badge>
               </Link>
             ))}
           </div>
-          <p className="pt-4">{title.description || 'No description.'}</p>
-          <LikeButton titleId={title.id} />
         </div>
       </div>
     </div>
@@ -70,33 +72,3 @@ function TitleInfo({
     <h1>Title not found!</h1>
   )
 }
-
-// <div className="flex flex-col">
-//     <div className="flex gap-1">
-//       {title.tagNames.map((tagName) => (
-//         <Link to={`/browse?tag=${tagName}`}>
-//           <Badge>{tagName}</Badge>
-//         </Link>
-//       ))}
-//     </div>
-//     <div className="flex w-full gap-1 py-4">
-//       <div className="flex w-3/4">
-//         <p className="text-muted-foreground">
-//           {title.description || 'No description.'}
-//         </p>
-//       </div>
-//       <div className="flex w-1/4 ">
-//         <img
-//           className="aspect-[2/3] object-cover rounded"
-//           src={title.coverUrl || ImageNotFound}
-//           alt={title.name}
-//         />
-//       </div>
-//     </div>
-//     <div>
-//       <LikeButton titleId={title.id} />
-//     </div>
-//   </div>
-// ) : (
-//   <h1>Title not found!</h1>
-// )

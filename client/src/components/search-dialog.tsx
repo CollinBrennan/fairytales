@@ -14,6 +14,7 @@ import { useDebouncedCallback } from 'use-debounce'
 
 import TitleList from './title-list'
 import { ScrollArea } from './ui/scroll-area'
+import { Button } from './ui/button'
 
 async function fetchTitles(titleName: string) {
   const res = await api.titles.$get({ query: { q: titleName } })
@@ -33,8 +34,10 @@ export default function SearchDialog() {
 
   return (
     <Dialog>
-      <DialogTrigger>
-        <SearchIcon />
+      <DialogTrigger asChild>
+        <Button variant="ghost">
+          <SearchIcon />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

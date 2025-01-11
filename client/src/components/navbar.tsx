@@ -1,64 +1,99 @@
 import { signIn, signOut, useSession } from '@hono/auth-js/react'
-import { Button, buttonVariants } from '@/components/ui/button'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
+import { Button } from '@/components/ui/button'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import SearchDialog from './search-dialog'
-import { Heart } from 'lucide-react'
+import { Heart, LogOut, Settings } from 'lucide-react'
+import { Separator } from './ui/separator'
+import { User } from '@auth/core/types'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+} from './ui/dropdown-menu'
+import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+
+type NavItem = {
+  name: string
+  pathname: string
+}
+const navItems: NavItem[] = [{ name: 'browse', pathname: '/browse' }]
 
 export default function Navbar() {
   const { data: session } = useSession()
+  const { pathname } = useLocation()
   const user = session?.user
 
   return (
-    <div className="bg-background">
+    <>
       <div className="mx-auto w-full max-w-screen-xl flex items-center justify-between px-4 py-2">
-        <div className="flex items-center">
-          <Link to="/" className="font-bold">
-            Fairytales
-          </Link>
-          <Link to="/browse" className={buttonVariants({ variant: 'link' })}>
-            Browse
-          </Link>
-        </div>
-
-        <div className="flex items-center gap-4">
-          <SearchDialog />
-          {user ? (
-            <>
-              <Link to="/likes">
-                <Heart />
+        <div className="w-full flex justify-between">
+          <nav className="flex items-center gap-4">
+            <Link to="/" className="text-lg font-bold uppercase">
+              F<span className="text-pink-300">ai</span>rytales
+            </Link>
+            {navItems.map((navItem) => (
+              <Link
+                to={navItem.pathname}
+                className={`hover:text-foreground capitalize ${
+                  navItem.pathname === pathname
+                    ? 'text-foreground'
+                    : 'text-foreground/80'
+                }`}
+              >
+                {navItem.name}
               </Link>
-              <Popover>
-                <PopoverTrigger asChild tabIndex={0}>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage src={user.image || undefined} />
-                    <AvatarFallback>{user.name?.slice(2)}</AvatarFallback>
-                  </Avatar>
-                </PopoverTrigger>
-                <PopoverContent className="flex flex-col w-full">
-                  <Button
-                    variant="link"
-                    onClick={() =>
-                      signOut({ callbackUrl: '/', redirect: true })
-                    }
-                  >
-                    Sign out
-                  </Button>
-                </PopoverContent>
-              </Popover>
-            </>
-          ) : (
-            <Button variant="outline" onClick={() => signIn('google')}>
-              Sign in
-            </Button>
-          )}
+            ))}
+          </nav>
+          <div className="flex items-center">
+            <SearchDialog />
+            {user ? (
+              <UserMenu user={user} />
+            ) : (
+              <Button variant="outline" onClick={() => signIn('google')}>
+                Sign in
+              </Button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+      <Separator />
+    </>
+  )
+}
+
+function UserMenu({ user }: { user: User }) {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger>
+        <Avatar>
+          <AvatarImage src={user.image || undefined} />
+          <AvatarFallback>{user.name?.slice(2)}</AvatarFallback>
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <Link to="/likes">
+          <DropdownMenuItem>
+            <Heart /> Likes
+          </DropdownMenuItem>
+        </Link>
+        <Link to="/settings">
+          <DropdownMenuItem>
+            <Settings /> Settings
+          </DropdownMenuItem>
+        </Link>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          onClick={() => signOut({ callbackUrl: '/', redirect: true })}
+        >
+          <LogOut />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
