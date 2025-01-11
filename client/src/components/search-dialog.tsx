@@ -9,7 +9,7 @@ import {
 import { Input } from './ui/input'
 import { api } from '@/lib/api'
 import { Suspense, useState } from 'react'
-import { Title } from '@server/db/schema/title'
+import { TitleWithType } from '@server/db/schema/title'
 import { useDebouncedCallback } from 'use-debounce'
 
 import TitleList from './title-list'
@@ -23,9 +23,9 @@ async function fetchTitles(titleName: string) {
 }
 
 export default function SearchDialog() {
-  const [titlesPromise, setTitlesPromise] = useState<Promise<Title[]> | null>(
-    null
-  )
+  const [titlesPromise, setTitlesPromise] = useState<Promise<
+    TitleWithType[]
+  > | null>(null)
   const onSearchDebounced = useDebouncedCallback(onSearch, 500)
 
   function onSearch(titleName: string) {
@@ -47,13 +47,16 @@ export default function SearchDialog() {
           placeholder="Search..."
           onChange={(e) => onSearchDebounced(e.target.value)}
         />
-        <ScrollArea className="max-h-[50vh]">
-          {titlesPromise && (
-            <Suspense fallback={<div>Loading titles...</div>}>
-              <TitleList titlesPromise={titlesPromise} />
-            </Suspense>
-          )}
-        </ScrollArea>
+        {titlesPromise && (
+          <>
+            <div className="text-sm text-muted-foreground pt-4">Results</div>
+            <ScrollArea className="max-h-[50vh] pr-4">
+              <Suspense fallback={<div>Loading titles...</div>}>
+                <TitleList titlesPromise={titlesPromise} />
+              </Suspense>
+            </ScrollArea>
+          </>
+        )}
       </DialogContent>
     </Dialog>
   )

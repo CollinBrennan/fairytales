@@ -1,10 +1,11 @@
 import { Link } from 'react-router'
-import ImageNotFound from '../assets/not-found.png'
 import { use } from 'react'
-import { Title } from '@server/db/schema/title'
+import { TitleWithType } from '@server/db/schema/title'
+import TitleCover from './title-cover'
+import { getYear } from 'date-fns'
 
 type Props = {
-  titlesPromise: Promise<Title[]>
+  titlesPromise: Promise<TitleWithType[]>
 }
 
 export default function TitleList({ titlesPromise }: Props) {
@@ -16,27 +17,27 @@ export default function TitleList({ titlesPromise }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4 py-4">
-      <div className="text-sm text-muted-foreground">Results</div>
+    <ul className="flex flex-col">
       {titles.map((title) => (
-        <Link key={title.id} to={`/title/${title.id}`} className="group">
-          <div className="flex items-center  gap-4">
-            <img
-              className="aspect-[2/3] h-24 object-cover"
-              src={title.imageUrl || ImageNotFound}
-              alt={title.name}
-            />
+        <li>
+          <Link
+            key={title.id}
+            to={`/title/${title.id}`}
+            className="flex items-center gap-4 hover:bg-accent rounded-md p-2"
+          >
+            <TitleCover title={title} className="h-28" />
             <div>
-              <div className="font-semibold group-hover:underline">
-                {title.name}
+              <div className="font-semibold line-clamp-1">{title.name}</div>
+              <div className="capitalize text-sm font-semibold text-muted-foreground line-clamp-1">
+                {getYear(title.releaseDate)} {title.typeName}
               </div>
-              <div className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground line-clamp-2 py-1">
                 {title.description || 'No description.'}
-              </div>
+              </p>
             </div>
-          </div>
-        </Link>
+          </Link>
+        </li>
       ))}
-    </div>
+    </ul>
   )
 }

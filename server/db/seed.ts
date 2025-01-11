@@ -74,8 +74,15 @@ async function seed() {
       typeId: 'type2',
     },
     {
-      name: 'Capitalized Name',
+      name: 'REALLY REALLY LONG NAME FOR TESTING PURPOSES REALLY REALLY LONG NAME FOR TESTING PURPOSES REALLY REALLY LONG NAME FOR TESTING PURPOSES ',
       id: 'title51',
+      typeId: 'type2',
+      description:
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis semper egestas augue, quis tempor elit faucibus id. In ut leo malesuada, iaculis velit vel, euismod risus. Curabitur condimentum arcu vitae magna iaculis, ac blandit dolor ultrices. Etiam in commodo sapien, vel facilisis ligula. Nunc sollicitudin tellus nulla, ut congue augue malesuada ac. Nullam vestibulum varius ex vitae malesuada. Maecenas in justo mi. Sed ac eros in dolor laoreet vulputate.',
+    },
+    {
+      name: 'Capitalized Name',
+      id: 'title52',
       typeId: 'type1',
     },
   ])
