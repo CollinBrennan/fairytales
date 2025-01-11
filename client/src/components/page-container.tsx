@@ -6,8 +6,8 @@ interface Props extends PropsWithChildren {
 
 export default function PageContainer({ name, children }: Props) {
   return (
-    <main className="mx-auto w-full max-w-screen-xl px-4">
-      {name && <h1 className="text-2xl font-bold pt-4 pb-8">{name}</h1>}
+    <main className="mx-auto w-full max-w-screen-xl pt-4 px-4">
+      {name && <h1 className="text-2xl font-bold pb-8">{name}</h1>}
       {children}
     </main>
   )

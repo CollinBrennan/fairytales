@@ -8,7 +8,7 @@ import * as type from './schema/type'
 import * as titleTag from './schema/title-tag'
 import * as users from './schema/users'
 
-const schema = { ...like, tag, title, type, titleTag, users }
+const schema = { ...like, ...tag, ...title, ...type, ...titleTag, ...users }
 
 const sqlite = new Database(process.env.DB_FILE_NAME!)
 const db = drizzle({ client: sqlite, schema })

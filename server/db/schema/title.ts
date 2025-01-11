@@ -1,7 +1,8 @@
 import { relations, type InferSelectModel } from 'drizzle-orm'
-import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core'
+import { sqliteTable, text } from 'drizzle-orm/sqlite-core'
 import { nanoid } from 'nanoid'
 import { type, type Type } from './type'
+import { type Tag } from './tag'
 import { titleTag } from './title-tag'
 import { like } from './like'
 
@@ -26,8 +27,13 @@ export const title = sqliteTable('title', {
 
 export type Title = InferSelectModel<typeof title>
 export type TitleWithType = Title & { typeName: Type['name'] }
+export type TitleWithTypeAndTags = TitleWithType & { tagNames: Tag['name'][] }
 
-export const titleRelations = relations(title, ({ many }) => ({
+export const titleRelations = relations(title, ({ one, many }) => ({
+  type: one(type, {
+    fields: [title.typeId],
+    references: [type.id],
+  }),
   titleTag: many(titleTag),
   like: many(like),
 }))
