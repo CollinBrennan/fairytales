@@ -8,6 +8,11 @@
     "jsx": "react-jsx",
     "allowJs": true,
 
+    "baseUrl": ".",
+    "paths": {
+      "@db/*": ["./db/*"]
+    },
+
     // Bundler mode
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,

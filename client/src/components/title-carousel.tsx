@@ -7,7 +7,7 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from './ui/carousel'
-import { TitleWithType } from '@server/db/schema/title'
+import { TitleWithType } from '@db/schema/title'
 
 type Props = {
   name: string

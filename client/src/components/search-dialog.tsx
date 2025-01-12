@@ -9,7 +9,7 @@ import {
 import { Input } from './ui/input'
 import { api } from '@/lib/api'
 import { Suspense, useState } from 'react'
-import { TitleWithType } from '@server/db/schema/title'
+import { TitleWithType } from '@db/schema/title'
 import { useDebouncedCallback } from 'use-debounce'
 
 import TitleList from './title-list'

@@ -1,5 +1,5 @@
 import { Link } from 'react-router'
-import { TitleWithType } from '@server/db/schema/title'
+import { TitleWithType } from '@db/schema/title'
 import { getYear } from 'date-fns'
 import TitleCover from './title-cover'
 

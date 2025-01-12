@@ -1,4 +1,4 @@
-import { Title } from '@server/db/schema/title'
+import { Title } from '@db/schema/title'
 import ImageNotFound from '../assets/not-found.png'
 
 type Props = {

@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { api } from '@/lib/api'
-import { Title } from '@server/db/schema/title'
+import { Title } from '@db/schema/title'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 

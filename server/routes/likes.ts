@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import db from '../db/drizzle'
-import { like } from '../db/schema/like'
+import db from '@db/drizzle'
+import { like } from '@db/schema/like'
 import { and, eq } from 'drizzle-orm'
 import { getAuthUser, verifyAuth } from '@hono/auth-js'
 

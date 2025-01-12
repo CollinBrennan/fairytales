@@ -1,6 +1,6 @@
 import { use } from 'react'
 import TitleCard from './title-card'
-import { TitleWithType } from '@server/db/schema/title'
+import { TitleWithType } from '@db/schema/title'
 
 type Props = {
   titlesPromise: Promise<TitleWithType[]>

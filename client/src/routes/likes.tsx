@@ -2,7 +2,7 @@ import PageContainer from '@/components/page-container'
 import TitleGrid from '@/components/title-grid'
 import { api } from '@/lib/api'
 import { useSession } from '@hono/auth-js/react'
-import { TitleWithType } from '@server/db/schema/title'
+import { TitleWithType } from '@db/schema/title'
 import { Suspense, useEffect, useState } from 'react'
 
 async function fetchTitles() {

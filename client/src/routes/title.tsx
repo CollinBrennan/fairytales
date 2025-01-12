@@ -1,5 +1,5 @@
 import { api } from '@/lib/api'
-import { TitleWithTypeAndTags } from '@server/db/schema/title'
+import { TitleWithTypeAndTags } from '@db/schema/title'
 import { Suspense, use } from 'react'
 import { Link, useParams } from 'react-router'
 import ImageNotFound from '../assets/not-found.png'
