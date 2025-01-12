@@ -4,7 +4,8 @@
   "type": "module",
   "scripts": {
     "start": "bun ./server/index.ts",
-    "dev": "bun --watch ./server/index.ts"
+    "dev": "bun --watch ./server/index.ts",
+    "dev:gen": "bun --watch ./generator-server/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest",

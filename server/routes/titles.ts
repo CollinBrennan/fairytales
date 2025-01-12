@@ -1,10 +1,6 @@
 import { Hono } from 'hono'
 import db from '@db/drizzle'
-import {
-  title,
-  type TitleWithType,
-  type TitleWithTypeAndTags,
-} from '@db/schema/title'
+import { title, type TitleWithType } from '@db/schema/title'
 import { and, eq, getTableColumns, like, SQL } from 'drizzle-orm'
 import { type } from '@db/schema/type'
 import { titleTag } from '@db/schema/title-tag'

@@ -1,23 +1,19 @@
 import { Hono } from 'hono'
 import { logger } from 'hono/logger'
+import { serveStatic } from 'hono/bun'
+import { titleRoute } from './routes/titles'
 
 const app = new Hono({ strict: false }).basePath('/')
-
-async function generateTitle() {
-  const { stdout, stderr } = Bun.spawnSync(['python', './scripts/test.py'])
-  console.log('Python: ', stdout.toString())
-  console.log('Python error: ', stderr.toString())
-  const file = Bun.file('./output/data.json')
-  const data = await file.json()
-  return data
-}
 
 // middleware
 app.use('*', logger())
 
-// routes
-app.get('/api/title', async (c) => c.json(await generateTitle()))
-
+// api
+const apiRoutes = app.basePath('/api').route('/titlestest', titleRoute)
 app.get('/api/*', (c) => c.notFound())
 
+// user client
+app.get('*', serveStatic({ root: './client/dist' }))
+
 export default app
+export type ApiRoutes = typeof apiRoutes
