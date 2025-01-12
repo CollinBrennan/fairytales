@@ -2,7 +2,7 @@ import PageContainer from '@/components/page-container'
 import TitleGrid from '@/components/title-grid'
 import { api } from '@/lib/api'
 import { useSession } from '@hono/auth-js/react'
-import { Title } from '@server/db/schema/title'
+import { TitleWithType } from '@server/db/schema/title'
 import { Suspense, useEffect, useState } from 'react'
 
 async function fetchTitles() {
@@ -12,7 +12,7 @@ async function fetchTitles() {
 }
 
 export default function LikesPage() {
-  const [titlesPromise, setTitlesPromise] = useState<Promise<Title[]>>(
+  const [titlesPromise, setTitlesPromise] = useState<Promise<TitleWithType[]>>(
     new Promise(() => [])
   )
 
