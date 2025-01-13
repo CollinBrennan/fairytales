@@ -1,15 +1,11 @@
-# trek
+# Fairytales
 
-To install dependencies:
+Fairytales is a full stack web app that hosts metadata for AI-generated media like movies, shows, and games.
 
-```bash
-bun install
-```
+Stack
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.1.27. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+- React
+- Hono
+- Bun
+- PostgreSQL
+- Tailwind
