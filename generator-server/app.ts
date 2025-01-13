@@ -9,11 +9,11 @@ const app = new Hono({ strict: false }).basePath('/')
 app.use('*', logger())
 
 // api
-const apiRoutes = app.basePath('/api').route('/titlestest', titleRoute)
+const apiRoutes = app.basePath('/api').route('/titles', titleRoute)
 app.get('/api/*', (c) => c.notFound())
 
-// user client
-app.get('*', serveStatic({ root: './client/dist' }))
+// generator client
+app.get('*', serveStatic({ root: './generator-client/dist' }))
 
 export default app
 export type ApiRoutes = typeof apiRoutes
