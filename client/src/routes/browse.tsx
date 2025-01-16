@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { api } from '@/lib/api'
-import { Title } from '@db/schema/title'
+import { TitleWithType } from '@db/schema/title'
 import { Suspense, useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router'
 
@@ -37,7 +37,7 @@ export default function BrowsePage() {
   // so use this instead
   const EMPTY_VALUE = 'any'
 
-  const [titlesPromise, setTitlesPromise] = useState<Promise<Title[]>>(
+  const [titlesPromise, setTitlesPromise] = useState<Promise<TitleWithType[]>>(
     new Promise(() => [])
   )
   const [typeOptions, setTypeOptions] = useState([
