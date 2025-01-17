@@ -14,7 +14,6 @@ import { HTTPException } from 'hono/http-exception'
 
 export const authConfig = initAuthConfig(() => ({
   secret: process.env.AUTH_SECRET,
-  strategy: 'database',
   adapter: DrizzleAdapter(db, {
     usersTable: users,
     accountsTable: accounts,

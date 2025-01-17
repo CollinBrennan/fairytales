@@ -34,6 +34,12 @@ async function fetchTypes() {
   return json.types
 }
 
+async function insertTitle(formData: InsertTitleSchema) {
+  const res = await api.titles.$post({ form: formData })
+  const json = await res.json()
+  return json.titleId
+}
+
 export default function TitleForm() {
   const [typeOptions, setTypeOptions] = useState<Type[]>([])
 
@@ -44,8 +50,9 @@ export default function TitleForm() {
     },
   })
 
-  function onSubmit(values: InsertTitleSchema) {
-    console.log(values)
+  async function onSubmit(formData: InsertTitleSchema) {
+    const titleId = await insertTitle(formData)
+    console.log(titleId)
   }
 
   useEffect(() => {
@@ -59,7 +66,10 @@ export default function TitleForm() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+      <form
+        onSubmit={form.handleSubmit(async (data) => await onSubmit(data))}
+        className="space-y-8"
+      >
         <FormField
           control={form.control}
           name="name"
