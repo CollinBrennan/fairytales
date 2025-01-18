@@ -101,7 +101,10 @@ export const titleRoute = new Hono()
 
       if (formData.image) {
         const utapi = new UTApi()
-        const uploadFileResults = await utapi.uploadFiles([formData.image])
+        const image = new File([formData.image], crypto.randomUUID(), {
+          type: formData.image.type,
+        })
+        const uploadFileResults = await utapi.uploadFiles([image])
         const { data, error } = uploadFileResults[0]
         if (data) coverUrl = data?.url
         if (error) console.log('Uploadthing error: ' + error.message)
