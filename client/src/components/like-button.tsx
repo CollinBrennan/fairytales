@@ -12,10 +12,10 @@ async function deleteLike(titleId: string) {
   await api.likes.$delete({ json: { titleId } })
 }
 
-async function doesUserLikeTitle(titleId: string) {
+async function hasUserLikedTitle(titleId: string) {
   const data = await api.likes[':titleId'].$get({ param: { titleId } })
   const json = await data.json()
-  return json.likeExists
+  return json.userLikesTitle
 }
 
 type Props = {
@@ -30,8 +30,7 @@ export default function LikeButton({ titleId }: Props) {
 
   useEffect(() => {
     startTransition(async () => {
-      const userLikes = await doesUserLikeTitle(titleId)
-      setUserLikesTitle(userLikes)
+      setUserLikesTitle(await hasUserLikedTitle(titleId))
     })
   }, [])
 

@@ -1,84 +1,38 @@
 import { Hono } from 'hono'
-import db from '@db/drizzle'
-import { insertTitleSchema, title, type TitleWithType } from '@db/schema/title'
-import { and, eq, getTableColumns, like, SQL } from 'drizzle-orm'
-import { type } from '@db/schema/type'
-import { titleTag } from '@db/schema/title-tag'
-import { tag } from '@db/schema/tag'
 import { getAuthUser } from '@hono/auth-js'
-import { like as likes } from '@db/schema/like'
 import { verifyAdmin } from 'server/auth'
 import { validator } from 'hono/validator'
 import { UTApi } from 'uploadthing/server'
 
-const titleWithTypeColumns = { ...getTableColumns(title), typeName: type.name }
+import { insertTitleSchema, type TitleWithType } from '@db/schema/title'
+import {
+  createTitle,
+  fetchLikedTitles,
+  fetchTitleById,
+  fetchTitlesByQuery,
+} from '@db/queries/title'
 
 export const titleRoute = new Hono()
   .get('/', async (c) => {
     const { q: titleName, type: typeName, tag: tagName } = c.req.query()
-    const filters: SQL<unknown>[] = []
+    const titles = await fetchTitlesByQuery(titleName, typeName, tagName)
 
-    if (titleName) filters.push(like(title.name, `%${titleName}%`))
-    if (typeName) filters.push(eq(type.name, typeName))
-    if (tagName) filters.push(eq(tag.name, tagName))
-
-    let query = db
-      .select(titleWithTypeColumns)
-      .from(title)
-      .where(and(...filters))
-      .innerJoin(type, eq(title.typeId, type.id))
-
-    if (tagName)
-      query = query
-        .innerJoin(titleTag, eq(title.id, titleTag.titleId))
-        .innerJoin(tag, eq(tag.id, titleTag.tagId))
-
-    return c.json({ titles: (await query) as TitleWithType[] })
+    return c.json({ titles })
   })
   .get('/liked', async (c) => {
     const authUser = await getAuthUser(c)
     const user = authUser?.user
 
-    if (user) {
-      const titles = await db
-        .select(titleWithTypeColumns)
-        .from(title)
-        .innerJoin(type, eq(title.typeId, type.id))
-        .innerJoin(
-          likes,
-          and(eq(likes.userId, user.id), eq(title.id, likes.titleId))
-        )
+    let titles: TitleWithType[] = []
+    if (user) titles = await fetchLikedTitles(user.id)
 
-      return c.json({ titles: titles as TitleWithType[] })
-    }
-
-    return c.json({ titles: [] })
+    return c.json({ titles })
   })
   .get('/:titleId', async (c) => {
     const { titleId } = c.req.param()
-    const query = await db.query.title.findFirst({
-      where: eq(title.id, titleId),
-      with: {
-        type: { columns: { name: true } },
-        titleTag: {
-          columns: {},
-          with: { tag: { columns: { name: true } } },
-        },
-      },
-    })
+    const title = await fetchTitleById(titleId)
 
-    if (!query) return c.json({ title: null })
-
-    const { titleTag: tags, type, ...things } = query
-    const titleWithTypeAndTags = {
-      ...things,
-      typeName: type.name,
-      tagNames: tags.map((tag) => tag.tag.name),
-    }
-
-    return c.json({
-      title: titleWithTypeAndTags,
-    })
+    return c.json({ title })
   })
   .post(
     '/',
@@ -97,27 +51,24 @@ export const titleRoute = new Hono()
     }),
     async (c) => {
       const formData = c.req.valid('form')
-      let coverUrl: string | null = null
 
+      let coverUrl: string | null = null
       if (formData.image) {
         const utapi = new UTApi()
-        const image = new File([formData.image], crypto.randomUUID(), {
-          type: formData.image.type,
-        })
-        const uploadFileResults = await utapi.uploadFiles([image])
+        const uploadFileResults = await utapi.uploadFiles([formData.image])
         const { data, error } = uploadFileResults[0]
         if (data) coverUrl = data?.url
         if (error) console.log('Uploadthing error: ' + error.message)
       }
 
-      const insertedTitle = await db
-        .insert(title)
-        .values({
-          ...formData,
-          coverUrl,
-        })
-        .returning()
+      const title = await createTitle({
+        name: formData.name,
+        typeId: formData.typeId,
+        description: formData.description,
+        releaseDate: formData.releaseDate,
+        coverUrl,
+      })
 
-      return c.json({ titleId: insertedTitle[0].id })
+      return c.json({ titleId: title.id })
     }
   )

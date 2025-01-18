@@ -1,8 +1,6 @@
 import { Hono } from 'hono'
-import db from '@db/drizzle'
-import { like } from '@db/schema/like'
-import { and, eq } from 'drizzle-orm'
 import { getAuthUser, verifyAuth } from '@hono/auth-js'
+import { createLike, deleteLike, hasUserLikedTitle } from '@db/queries/like'
 
 export const likeRoute = new Hono()
   .get('/:titleId', async (c) => {
@@ -10,43 +8,26 @@ export const likeRoute = new Hono()
     const user = authUser?.user
     const { titleId } = c.req.param()
 
-    if (user) {
-      const titleLike = await db.query.like.findFirst({
-        where: and(eq(like.userId, user.id), eq(like.titleId, titleId)),
-      })
-      return c.json({ likeExists: titleLike !== undefined })
-    }
+    let userLikesTitle = false
+    if (user) userLikesTitle = await hasUserLikedTitle(user.id, titleId)
 
-    return c.json({ likeExists: false })
+    return c.json({ userLikesTitle })
   })
-
   .post('/', verifyAuth(), async (c) => {
     const auth = c.get('authUser')
     const user = auth.user
     const { titleId } = await c.req.json()
 
-    if (user) {
-      try {
-        await db.insert(like).values({ userId: user.id, titleId })
-        return c.body(null, 204)
-      } catch (error) {
-        return c.json({ error: 'Resource exists' }, 409)
-      }
-    }
+    if (user) createLike(user.id, titleId)
 
-    return c.json({ error: 'Unauthorized' }, 401)
+    return c.body(null, 204)
   })
   .delete('/', verifyAuth(), async (c) => {
     const auth = c.get('authUser')
     const user = auth.user
     const { titleId } = await c.req.json()
 
-    if (user) {
-      await db
-        .delete(like)
-        .where(and(eq(like.userId, user.id), eq(like.titleId, titleId)))
-      return c.body(null, 204)
-    }
+    if (user) deleteLike(user.id, titleId)
 
-    return c.json({ error: 'Unauthorized' }, 401)
+    return c.body(null, 204)
   })
