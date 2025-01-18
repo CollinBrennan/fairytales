@@ -34,7 +34,7 @@ export default function TitlePage() {
 function TitleInfo({
   titlePromise,
 }: {
-  titlePromise: Promise<TitleWithTypeAndTags | null>
+  titlePromise: Promise<TitleWithTypeAndTags | undefined>
 }) {
   const title = use(titlePromise)
 
