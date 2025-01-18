@@ -1,10 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router'
+import { api } from '@/lib/api'
+import { Type } from '@db/schema/type'
+import { useToast } from '@/hooks/use-toast'
 
 import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -23,10 +29,8 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from './ui/select'
-import { useEffect, useState } from 'react'
-import { api } from '@/lib/api'
-import { Type } from '@db/schema/type'
+} from '@/components/ui/select'
+import { ToastAction } from '@/components/ui/toast'
 
 async function fetchTypes() {
   const res = await api.types.$get()
@@ -40,19 +44,33 @@ async function insertTitle(formData: InsertTitleSchema) {
   return json.titleId
 }
 
+const defaultValues: InsertTitleSchema = {
+  name: '',
+  typeId: '',
+  description: '',
+  releaseDate: '',
+}
+
 export default function TitleForm() {
   const [typeOptions, setTypeOptions] = useState<Type[]>([])
+  const { toast } = useToast()
 
   const form = useForm<InsertTitleSchema>({
     resolver: zodResolver(insertTitleSchema),
-    defaultValues: {
-      name: '',
-    },
+    defaultValues,
   })
 
   async function onSubmit(formData: InsertTitleSchema) {
     const titleId = await insertTitle(formData)
-    console.log(titleId)
+    toast({
+      title: 'Title created!',
+      action: (
+        <ToastAction altText="View title" asChild>
+          <Link to={`/title/${titleId}`}>View title</Link>
+        </ToastAction>
+      ),
+    })
+    form.reset(defaultValues)
   }
 
   useEffect(() => {
@@ -75,9 +93,9 @@ export default function TitleForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Title Name</FormLabel>
               <FormControl>
-                <Input placeholder="shadcn" {...field} />
+                <Input placeholder="Enter title name" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,7 +110,7 @@ export default function TitleForm() {
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                 <FormControl>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder="Select title type" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
@@ -114,7 +132,24 @@ export default function TitleForm() {
             <FormItem>
               <FormLabel>Description</FormLabel>
               <FormControl>
-                <Textarea placeholder="shadcn" {...field} />
+                <Textarea placeholder="Enter title description" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="releaseDate"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Release date</FormLabel>
+              <FormControl>
+                <Input
+                  type="date"
+                  placeholder="Enter title release date"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,24 +160,27 @@ export default function TitleForm() {
           name="image"
           render={({ field: { onChange } }) => (
             <FormItem>
-              <FormLabel>Image</FormLabel>
+              <FormLabel>Cover Image</FormLabel>
               <FormControl>
                 <Input
                   accept={VALID_FILE_TYPES}
                   type="file"
-                  placeholder="shadcn"
-                  // set target to files instead of string
+                  placeholder="Upload title cover image"
+                  // set value to uploaded file instead of string
                   onChange={(event) =>
                     onChange(event.target.files && event.target.files[0])
                   }
                 />
               </FormControl>
+              <FormDescription>.png, .jpg, .jpeg</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <Button type="submit">Submit</Button>
+        <Button disabled={form.formState.isSubmitting} type="submit">
+          {form.formState.isSubmitting ? 'Submitting...' : 'Submit'}
+        </Button>
       </form>
     </Form>
   )

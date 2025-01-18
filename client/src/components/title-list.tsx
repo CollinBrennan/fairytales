@@ -12,7 +12,6 @@ export default function TitleList({ titlesPromise }: Props) {
   const titles = use(titlesPromise)
 
   if (titles.length === 0) {
-    console.log('Thing fired.')
     return <div>No titles found.</div>
   }
 

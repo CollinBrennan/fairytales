@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 
 import Navbar from './components/navbar'
+import { Toaster } from './components/ui/toaster'
 
 import TitlePage from './routes/title'
 import BrowsePage from './routes/browse'
@@ -20,6 +21,7 @@ function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="*" element={<div>Page not found.</div>} />
       </Routes>
+      <Toaster />
     </BrowserRouter>
   )
 }

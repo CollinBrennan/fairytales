@@ -17,12 +17,10 @@ export const title = sqliteTable('title', {
   typeId: text('type_id')
     .notNull()
     .references(() => type.id),
-  description: text('description'),
+  description: text('description').notNull(),
+  releaseDate: text('release_date').notNull(),
   coverUrl: text('cover_url'),
   trailerUrl: text('trailer_url'),
-  releaseDate: text('release_date')
-    .notNull()
-    .$defaultFn(() => new Date().toISOString()),
   createdAt: text('created_at')
     .notNull()
     .$defaultFn(() => new Date().toISOString()),
@@ -32,12 +30,14 @@ export type Title = InferSelectModel<typeof title>
 export type TitleWithType = Title & { typeName: Type['name'] }
 export type TitleWithTypeAndTags = TitleWithType & { tagNames: Tag['name'][] }
 
-const MAX_FILE_SIZE_IN_BYTES = 3_000_000
+const MAX_FILE_SIZE_IN_BYTES = 4_000_000
 export const VALID_FILE_TYPES = 'image/png, image/jpeg'
 
 export const insertTitleSchema = createInsertSchema(title, {
-  name: (schema) => schema.nonempty().trim(),
-  description: z.string().trim().optional(), // form input doesn't like null
+  name: (schema) => schema.trim().nonempty(),
+  typeId: (schema) => schema.trim().nonempty(),
+  description: (schema) => schema.trim().nonempty(),
+  releaseDate: (schema) => schema.date().nonempty(),
 })
   .omit({
     id: true,
@@ -49,7 +49,7 @@ export const insertTitleSchema = createInsertSchema(title, {
     image: z
       .instanceof(File)
       .refine((file) => file && file.size <= MAX_FILE_SIZE_IN_BYTES, {
-        message: 'File must be 3MB or less.',
+        message: 'File must be 4MB or less.',
       })
       .refine((file) => file && VALID_FILE_TYPES.includes(file.type), {
         message: 'Image must be .png, .jpg, or .jpeg',

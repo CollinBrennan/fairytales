@@ -8,8 +8,8 @@ import { tag } from '@db/schema/tag'
 import { getAuthUser } from '@hono/auth-js'
 import { like as likes } from '@db/schema/like'
 import { verifyAdmin } from 'server/auth'
-import { zValidator } from '@hono/zod-validator'
 import { validator } from 'hono/validator'
+import { UTApi } from 'uploadthing/server'
 
 const titleWithTypeColumns = { ...getTableColumns(title), typeName: type.name }
 
@@ -83,18 +83,38 @@ export const titleRoute = new Hono()
   .post(
     '/',
     verifyAdmin(),
-    validator('form', (value, c) => {
+    validator('form', async (value, c) => {
       // FormData coerces undefined to 'undefined'
       if (value.image === 'undefined') delete value.image
 
       const { data, error, success } = insertTitleSchema.safeParse(value)
+      if (!success) {
+        console.log('Form parse error: ' + error.message)
+        return c.text('Invalid form', 400)
+      }
 
-      if (!success) return c.json({ error: error.message }, 401)
       return data
     }),
     async (c) => {
       const formData = c.req.valid('form')
-      const insertedTitle = await db.insert(title).values(formData).returning()
+      let coverUrl: string | null = null
+
+      if (formData.image) {
+        const utapi = new UTApi()
+        const uploadFileResults = await utapi.uploadFiles([formData.image])
+        const { data, error } = uploadFileResults[0]
+        if (data) coverUrl = data?.url
+        if (error) console.log('Uploadthing error: ' + error.message)
+      }
+
+      const insertedTitle = await db
+        .insert(title)
+        .values({
+          ...formData,
+          coverUrl,
+        })
+        .returning()
+
       return c.json({ titleId: insertedTitle[0].id })
     }
   )

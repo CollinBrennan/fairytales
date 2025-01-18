@@ -4,7 +4,6 @@ import { serveStatic } from 'hono/bun'
 import { authHandler } from '@hono/auth-js'
 import { authConfig } from './auth.ts'
 
-import { uploadthingRoute } from './routes/uploadthing.ts'
 import { titleRoute } from './routes/titles'
 import { typeRoute } from './routes/types'
 import { tagRoute } from './routes/tags'
@@ -20,7 +19,6 @@ app.use('/api/auth/*', authHandler())
 // api
 const apiRoutes = app
   .basePath('/api')
-  .route('/uploadthing', uploadthingRoute)
   .route('/titles', titleRoute)
   .route('/types', typeRoute)
   .route('/tags', tagRoute)
