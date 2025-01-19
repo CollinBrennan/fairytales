@@ -7,7 +7,7 @@ import { authConfig } from './auth.ts'
 import { titleRoute } from './routes/titles'
 import { typeRoute } from './routes/types'
 import { tagRoute } from './routes/tags'
-import { likeRoute } from './routes/likes'
+import { saveRoute } from './routes/saves'
 
 const app = new Hono()
 
@@ -22,7 +22,7 @@ const apiRoutes = app
   .route('/titles', titleRoute)
   .route('/types', typeRoute)
   .route('/tags', tagRoute)
-  .route('/likes', likeRoute)
+  .route('/saves', saveRoute)
 
 app.get('/api/*', (c) => c.notFound())
 

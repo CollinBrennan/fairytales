@@ -15,7 +15,7 @@ import {
   SQL,
   type InferInsertModel,
 } from 'drizzle-orm'
-import { like as likes } from '@db/schema/like'
+import { save } from '@db/schema/save'
 
 const titleWithTypeColumns = { ...getTableColumns(title), typeName: type.name }
 
@@ -71,17 +71,14 @@ export async function fetchTitlesByQuery(
   return titles
 }
 
-export async function fetchLikedTitles(
+export async function fetchSavedTitles(
   userId: string
 ): Promise<TitleWithType[]> {
   const titles = await db
     .select(titleWithTypeColumns)
     .from(title)
     .innerJoin(type, eq(title.typeId, type.id))
-    .innerJoin(
-      likes,
-      and(eq(likes.userId, userId), eq(title.id, likes.titleId))
-    )
+    .innerJoin(save, and(eq(save.userId, userId), eq(title.id, save.titleId)))
 
   return titles
 }

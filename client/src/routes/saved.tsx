@@ -7,12 +7,12 @@ import { Suspense, useEffect, useState } from 'react'
 import PleaseSignInPage from './please-sign-in'
 
 async function fetchTitles() {
-  const res = await api.titles.liked.$get()
+  const res = await api.titles.saved.$get()
   const json = await res.json()
   return json.titles
 }
 
-export default function Likes() {
+export default function Saved() {
   const { data: session } = useSession()
   const user = session?.user
 
@@ -27,7 +27,7 @@ export default function Likes() {
   if (!user) return <PleaseSignInPage />
 
   return (
-    <PageContainer name="Your liked titles">
+    <PageContainer name="Your saved titles">
       <Suspense fallback={<div>Loading titles...</div>}>
         <TitleGrid titlesPromise={titlesPromise} />
       </Suspense>

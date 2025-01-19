@@ -7,7 +7,7 @@ import { UTApi } from 'uploadthing/server'
 import { insertTitleSchema, type TitleWithType } from '@db/schema/title'
 import {
   createTitle,
-  fetchLikedTitles,
+  fetchSavedTitles,
   fetchTitleById,
   fetchTitlesByQuery,
 } from '@db/queries/title'
@@ -19,12 +19,12 @@ export const titleRoute = new Hono()
 
     return c.json({ titles })
   })
-  .get('/liked', async (c) => {
+  .get('/saved', async (c) => {
     const authUser = await getAuthUser(c)
     const user = authUser?.user
 
     let titles: TitleWithType[] = []
-    if (user) titles = await fetchLikedTitles(user.id)
+    if (user) titles = await fetchSavedTitles(user.id)
 
     return c.json({ titles })
   })

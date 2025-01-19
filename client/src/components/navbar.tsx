@@ -2,7 +2,7 @@ import { signOut, useSession } from '@hono/auth-js/react'
 import { Link, NavLink } from 'react-router'
 import { User } from '@auth/core/types'
 import { isAdmin } from '@/lib/auth'
-import { Heart, LogOut, Settings, Shield } from 'lucide-react'
+import { Bookmark, LogOut, Settings, Shield } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import SearchDialog from '@/components/search-dialog'
@@ -85,9 +85,9 @@ function UserDropdownMenu({ user }: { user: User }) {
         )}
 
         <DropdownMenuSeparator />
-        <Link to="/likes">
+        <Link to="/saved">
           <DropdownMenuItem>
-            <Heart /> Likes
+            <Bookmark /> Saved
           </DropdownMenuItem>
         </Link>
         <Link to="/settings">

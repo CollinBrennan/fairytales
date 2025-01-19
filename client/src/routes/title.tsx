@@ -2,11 +2,13 @@ import { api } from '@/lib/api'
 import { TitleWithTypeAndTags } from '@db/schema/title'
 import { Suspense, use } from 'react'
 import { Link, useParams } from 'react-router'
+import { getYear } from 'date-fns'
 import ImageNotFound from '../assets/not-found.png'
-import LikeButton from '@/components/like-button'
+
+import SaveButton from '@/components/save-button'
 import PageContainer from '@/components/page-container'
 import { Badge } from '@/components/ui/badge'
-import { getYear } from 'date-fns'
+import PageNotFound from './not-found'
 
 async function fetchTitle(titleId: string) {
   const res = await api.titles[':titleId'].$get({ param: { titleId: titleId } })
@@ -38,7 +40,9 @@ function TitleInfo({
 }) {
   const title = use(titlePromise)
 
-  return title ? (
+  if (!title) return <PageNotFound />
+
+  return (
     <div>
       <div className="flex gap-4 pt-4">
         <div className="basis-1/4">
@@ -54,7 +58,7 @@ function TitleInfo({
             {getYear(title.releaseDate)} {title.typeName}
           </div>
 
-          <LikeButton titleId={title.id} />
+          <SaveButton titleId={title.id} />
 
           <p className="pt-4">{title.description || 'No description.'}</p>
 
@@ -68,7 +72,5 @@ function TitleInfo({
         </div>
       </div>
     </div>
-  ) : (
-    <h1>Title not found!</h1>
   )
 }

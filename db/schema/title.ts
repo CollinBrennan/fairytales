@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { type, type Type } from './type'
 import { type Tag } from './tag'
 import { titleTag } from './title-tag'
-import { like } from './like'
+import { save } from './save'
 
 export const title = sqliteTable('title', {
   id: text('id')
@@ -65,5 +65,5 @@ export const titleRelations = relations(title, ({ one, many }) => ({
     references: [type.id],
   }),
   titleTag: many(titleTag),
-  like: many(like),
+  save: many(save),
 }))
