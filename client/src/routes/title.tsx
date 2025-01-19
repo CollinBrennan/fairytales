@@ -14,7 +14,7 @@ async function fetchTitle(titleId: string) {
   return json.title
 }
 
-export default function TitlePage() {
+export default function Title() {
   const params = useParams()
   const titleId = params.id
 

@@ -32,7 +32,7 @@ async function fetchTitles(params: URLSearchParams) {
   return json.titles
 }
 
-export default function BrowsePage() {
+export default function Browse() {
   // radix doesn't let you use empty string values for Select components (WHY???)
   // so use this instead
   const EMPTY_VALUE = 'any'

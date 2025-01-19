@@ -1,29 +1,30 @@
-import { signIn, signOut, useSession } from '@hono/auth-js/react'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
-import { Link, useLocation } from 'react-router'
-import SearchDialog from './search-dialog'
-import { Heart, LogOut, Settings } from 'lucide-react'
-import { Separator } from './ui/separator'
+import { signOut, useSession } from '@hono/auth-js/react'
+import { Link, NavLink } from 'react-router'
 import { User } from '@auth/core/types'
+import { isAdmin } from '@/lib/auth'
+import { Heart, LogOut, Settings, Shield } from 'lucide-react'
+
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import SearchDialog from '@/components/search-dialog'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from './ui/dropdown-menu'
-import { DropdownMenuTrigger } from '@radix-ui/react-dropdown-menu'
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Separator } from '@/components/ui/separator'
+import SigninButton from '@/components/signin-button'
 
-type NavItem = {
+type NavLinks = {
   name: string
   pathname: string
 }
-const navItems: NavItem[] = [{ name: 'browse', pathname: '/browse' }]
+const navItems: NavLinks[] = [{ name: 'browse', pathname: '/browse' }]
 
 export default function Navbar() {
   const { data: session } = useSession()
-  const { pathname } = useLocation()
   const user = session?.user
 
   return (
@@ -34,28 +35,23 @@ export default function Navbar() {
             <Link to="/" className="text-lg font-bold uppercase">
               F<span className="text-pink-300">ai</span>rytales
             </Link>
-            {navItems.map((navItem) => (
-              <Link
-                to={navItem.pathname}
-                className={`hover:text-foreground capitalize ${
-                  navItem.pathname === pathname
-                    ? 'text-foreground'
-                    : 'text-foreground/80'
-                }`}
+            {navItems.map((navLink) => (
+              <NavLink
+                key={navLink.pathname}
+                to={navLink.pathname}
+                className={({ isActive }) =>
+                  isActive
+                    ? 'capitalize text-foreground'
+                    : 'capitalize text-foreground/80 hover:text-foreground'
+                }
               >
-                {navItem.name}
-              </Link>
+                {navLink.name}
+              </NavLink>
             ))}
           </nav>
           <div className="flex items-center">
             <SearchDialog />
-            {user ? (
-              <UserMenu user={user} />
-            ) : (
-              <Button variant="outline" onClick={() => signIn('google')}>
-                Sign in
-              </Button>
-            )}
+            {user ? <UserDropdownMenu user={user} /> : <SigninButton />}
           </div>
         </div>
       </div>
@@ -64,7 +60,9 @@ export default function Navbar() {
   )
 }
 
-function UserMenu({ user }: { user: User }) {
+function UserDropdownMenu({ user }: { user: User }) {
+  const userIsAdmin = isAdmin(user)
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
@@ -75,6 +73,17 @@ function UserMenu({ user }: { user: User }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent>
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        {userIsAdmin && (
+          <>
+            <DropdownMenuSeparator />
+            <Link to="/admin">
+              <DropdownMenuItem>
+                <Shield /> Admin panel
+              </DropdownMenuItem>
+            </Link>
+          </>
+        )}
+
         <DropdownMenuSeparator />
         <Link to="/likes">
           <DropdownMenuItem>
@@ -86,6 +95,7 @@ function UserMenu({ user }: { user: User }) {
             <Settings /> Settings
           </DropdownMenuItem>
         </Link>
+
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => signOut({ callbackUrl: '/', redirect: true })}

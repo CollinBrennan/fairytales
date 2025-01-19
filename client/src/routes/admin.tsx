@@ -1,12 +1,16 @@
 import PageContainer from '@/components/page-container'
 import TitleForm from '@/components/title-form'
 import { useSession } from '@hono/auth-js/react'
+import UnauthorizedPage from './unauthorized'
+import { isAdmin } from '@/lib/auth'
+import PleaseSignIn from './please-sign-in'
 
-export default function AdminPage() {
+export default function Admin() {
   const { data: session } = useSession()
   const user = session?.user
 
-  if (!user || user.role !== 'admin') return <div>Unauthorized.</div>
+  if (!user) return <PleaseSignIn />
+  if (!isAdmin(user)) return <UnauthorizedPage />
 
   return (
     <PageContainer name="Admin">

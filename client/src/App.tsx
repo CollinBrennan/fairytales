@@ -3,23 +3,24 @@ import { BrowserRouter, Route, Routes } from 'react-router'
 import Navbar from './components/navbar'
 import { Toaster } from './components/ui/toaster'
 
-import TitlePage from './routes/title'
-import BrowsePage from './routes/browse'
-import HomePage from './routes/home'
-import LikesPage from './routes/likes'
-import AdminPage from './routes/admin'
+import Title from './routes/title'
+import Browse from './routes/browse'
+import Home from './routes/home'
+import Likes from './routes/likes'
+import Admin from './routes/admin'
+import PageNotFound from './routes/not-found'
 
 function App() {
   return (
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/title/:id" element={<TitlePage />} />
-        <Route path="/browse" element={<BrowsePage />} />
-        <Route path="/likes" element={<LikesPage />} />
-        <Route path="/admin" element={<AdminPage />} />
-        <Route path="*" element={<div>Page not found.</div>} />
+        <Route path="/" element={<Home />} />
+        <Route path="/title/:id" element={<Title />} />
+        <Route path="/browse" element={<Browse />} />
+        <Route path="/likes" element={<Likes />} />
+        <Route path="/admin" element={<Admin />} />
+        <Route path="*" element={<PageNotFound />} />
       </Routes>
       <Toaster />
     </BrowserRouter>

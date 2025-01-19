@@ -4,6 +4,7 @@ import { api } from '@/lib/api'
 import { useSession } from '@hono/auth-js/react'
 import { TitleWithType } from '@db/schema/title'
 import { Suspense, useEffect, useState } from 'react'
+import PleaseSignInPage from './please-sign-in'
 
 async function fetchTitles() {
   const res = await api.titles.liked.$get()
@@ -11,27 +12,25 @@ async function fetchTitles() {
   return json.titles
 }
 
-export default function LikesPage() {
+export default function Likes() {
+  const { data: session } = useSession()
+  const user = session?.user
+
   const [titlesPromise, setTitlesPromise] = useState<Promise<TitleWithType[]>>(
     new Promise(() => [])
   )
-
-  const { data: session } = useSession()
-  const user = session?.user
 
   useEffect(() => {
     setTitlesPromise(() => fetchTitles())
   }, [])
 
+  if (!user) return <PleaseSignInPage />
+
   return (
-    <PageContainer name="Liked Titles">
-      {user ? (
-        <Suspense fallback={<div>Loading titles...</div>}>
-          <TitleGrid titlesPromise={titlesPromise} />
-        </Suspense>
-      ) : (
-        <div>Please sign in to see your liked titles.</div>
-      )}
+    <PageContainer name="Your liked titles">
+      <Suspense fallback={<div>Loading titles...</div>}>
+        <TitleGrid titlesPromise={titlesPromise} />
+      </Suspense>
     </PageContainer>
   )
 }

@@ -9,7 +9,7 @@ async function fetchTitles() {
 
 const titlesPromise = fetchTitles()
 
-export default function HomePage() {
+export default function Home() {
   return (
     <main className="mx-auto w-full max-w-screen-xl px-4 py-2">
       <TitleCarousel name="Top Picks" titlesPromise={titlesPromise} />
