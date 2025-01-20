@@ -18,9 +18,6 @@ export const titleRoute = new Hono()
     const titleTypes = c.req.query('type')
     const titleTags = c.req.query('tag')
 
-    console.log('types: ', titleTypes)
-    console.log('tags ', titleTags)
-
     const titles = await fetchTitlesByQuery(
       titleName,
       titleTypes?.split(','),
