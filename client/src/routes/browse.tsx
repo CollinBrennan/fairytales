@@ -1,17 +1,16 @@
 import PageContainer from '@/components/page-container'
-import TitleGrid from '@/components/title-grid'
-import { Label } from '@/components/ui/label'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
+import { Form } from '@/components/ui/form'
 import { api } from '@/lib/api'
-import { TitleWithType } from '@db/schema/title'
+import { Type } from '@db/schema/type'
 import { Suspense, useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
 import { useSearchParams } from 'react-router'
+import { z } from 'zod'
+import { zodResolver } from '@hookform/resolvers/zod'
+import MultiselectPopover from '@/components/multiselect-popover'
+import { Tag } from '@db/schema/tag'
+import TitleGrid from '@/components/title-grid'
+import { TitleWithType } from '@db/schema/title'
 
 async function fetchTypes() {
   const res = await api.types.$get()
@@ -32,96 +31,100 @@ async function fetchTitles(params: URLSearchParams) {
   return json.titles
 }
 
-export default function Browse() {
-  // radix doesn't let you use empty string values for Select components (WHY???)
-  // so use this instead
-  const EMPTY_VALUE = 'any'
+const formSchema = z.object({
+  type: z.array(z.string()),
+  tag: z.array(z.string()),
+})
 
+export type FormSchema = z.infer<typeof formSchema>
+
+const defaultValues: FormSchema = {
+  type: [],
+  tag: [],
+}
+
+export default function Browse() {
   const [titlesPromise, setTitlesPromise] = useState<Promise<TitleWithType[]>>(
     new Promise(() => [])
   )
-  const [typeOptions, setTypeOptions] = useState([
-    { id: EMPTY_VALUE, name: EMPTY_VALUE },
-  ])
-  const [tagOptions, setTagOptions] = useState([
-    { id: EMPTY_VALUE, name: EMPTY_VALUE },
-  ])
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [typeOptions, setTypeOptions] = useState<Type[]>([])
+  const [tagOptions, setTagOptions] = useState<Tag[]>([])
+  const [params, setParams] = useSearchParams()
+  const formName = 'browse-form'
 
-  function onSearch(params: Record<string, string>) {
-    setSearchParams((prev) => {
-      Object.entries(params).forEach(([name, value]) => {
-        if (value === EMPTY_VALUE) prev.delete(name)
-        else prev.set(name, value)
-      })
+  const form = useForm<FormSchema>({
+    resolver: zodResolver(formSchema),
+    defaultValues,
+  })
 
-      return prev
+  function onSubmit(formData: FormSchema) {
+    setParams(() => {
+      const newParams = new URLSearchParams()
+
+      if (formData.type.length > 0)
+        newParams.set('type', formData.type.join(','))
+      if (formData.tag.length > 0) newParams.set('tag', formData.tag.join(','))
+
+      return newParams
     })
   }
 
   useEffect(() => {
-    async function initializeSelectOptions() {
+    async function setOptions() {
       const types = await fetchTypes()
       const tags = await fetchTags()
-      setTypeOptions((prev) => [...prev, ...types])
-      setTagOptions((prev) => [...prev, ...tags])
+      setTypeOptions(types)
+      setTagOptions(tags)
     }
+    setOptions()
 
-    initializeSelectOptions()
+    const typeParam = params.get('type')
+    const tagParam = params.get('tag')
+
+    if (typeParam) form.setValue('type', typeParam.split(','))
+    if (tagParam) form.setValue('tag', tagParam.split(','))
   }, [])
 
   useEffect(() => {
-    setTitlesPromise(() => fetchTitles(searchParams))
-  }, [searchParams])
+    setTitlesPromise(() => fetchTitles(params))
+  }, [params])
 
   return (
     <PageContainer name="Browse">
-      <div className="flex gap-8 items-center">
-        <div className="flex items-center gap-2">
-          <Label>Type</Label>
-          <Select
-            defaultValue={searchParams.get('type') || EMPTY_VALUE}
-            onValueChange={(value) => onSearch({ type: value })}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue
-                placeholder={searchParams.get('type') || EMPTY_VALUE}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {typeOptions.map((type) => (
-                <SelectItem key={type.id} value={type.name}>
-                  {type.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <Form {...form}>
+        <form
+          id={formName}
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-8"
+        >
+          <div className="flex gap-4">
+            <MultiselectPopover
+              label="Type"
+              fieldName="type"
+              form={form}
+              formName={formName}
+              options={typeOptions.map((option) => ({
+                name: option.name,
+                value: option.id,
+              }))}
+            />
 
-        <div className="flex items-center gap-2">
-          <Label>Tag</Label>
-          <Select
-            defaultValue={searchParams.get('tag') || EMPTY_VALUE}
-            onValueChange={(value) => onSearch({ tag: value })}
-          >
-            <SelectTrigger className="w-[180px]">
-              <SelectValue
-                placeholder={searchParams.get('tag') || EMPTY_VALUE}
-              />
-            </SelectTrigger>
-            <SelectContent>
-              {tagOptions.map((tag) => (
-                <SelectItem key={tag.id} value={tag.name}>
-                  {tag.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
+            <MultiselectPopover
+              label="Tag"
+              fieldName="tag"
+              form={form}
+              formName={formName}
+              options={tagOptions.map((option) => ({
+                name: option.name,
+                value: option.id,
+              }))}
+            />
+          </div>
+        </form>
+      </Form>
 
-      <div className="py-4">
-        <Suspense fallback={<div>Loading titles...</div>}>
+      <div className="py-8">
+        <Suspense fallback={'Loading...'}>
           <TitleGrid titlesPromise={titlesPromise} />
         </Suspense>
       </div>

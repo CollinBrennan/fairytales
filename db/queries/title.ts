@@ -14,6 +14,7 @@ import {
   and,
   SQL,
   type InferInsertModel,
+  inArray,
 } from 'drizzle-orm'
 import { save } from '@db/schema/save'
 
@@ -28,18 +29,18 @@ export async function fetchTitleById(
       type: { columns: { name: true } },
       titleTag: {
         columns: {},
-        with: { tag: { columns: { name: true } } },
+        with: { tag: true },
       },
     },
   })
 
   if (!query) return undefined
 
-  const { titleTag: tags, type, ...things } = query
+  const { titleTag, type, ...things } = query
   const titleWithTypeAndTags = {
     ...things,
     typeName: type.name,
-    tagNames: tags.map((tag) => tag.tag.name),
+    tags: titleTag.map((titleTag) => titleTag.tag),
   }
 
   return titleWithTypeAndTags
@@ -47,25 +48,22 @@ export async function fetchTitleById(
 
 export async function fetchTitlesByQuery(
   titleName?: string,
-  typeName?: string,
-  tagName?: string
+  typeIds?: string[],
+  tagIds?: string[]
 ): Promise<TitleWithType[]> {
   const filters: SQL<unknown>[] = []
 
   if (titleName) filters.push(like(title.name, `%${titleName}%`))
-  if (typeName) filters.push(eq(type.name, typeName))
-  if (tagName) filters.push(eq(tag.name, tagName))
+  if (typeIds) filters.push(inArray(title.typeId, typeIds))
+  if (tagIds) filters.push(inArray(titleTag.tagId, tagIds))
 
   let query = db
-    .select(titleWithTypeColumns)
+    .selectDistinct(titleWithTypeColumns)
     .from(title)
     .where(and(...filters))
     .innerJoin(type, eq(title.typeId, type.id))
 
-  if (tagName)
-    query = query
-      .innerJoin(titleTag, eq(title.id, titleTag.titleId))
-      .innerJoin(tag, eq(tag.id, titleTag.tagId))
+  if (tagIds) query = query.innerJoin(titleTag, eq(titleTag.titleId, title.id))
 
   const titles = await query
   return titles

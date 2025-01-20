@@ -28,7 +28,7 @@ export const title = sqliteTable('title', {
 
 export type Title = InferSelectModel<typeof title>
 export type TitleWithType = Title & { typeName: Type['name'] }
-export type TitleWithTypeAndTags = TitleWithType & { tagNames: Tag['name'][] }
+export type TitleWithTypeAndTags = TitleWithType & { tags: Tag[] }
 
 const MAX_FILE_SIZE_IN_BYTES = 4_000_000
 export const VALID_FILE_TYPES = 'image/png, image/jpeg'

@@ -7,7 +7,7 @@ import ImageNotFound from '../assets/not-found.png'
 
 import SaveButton from '@/components/save-button'
 import PageContainer from '@/components/page-container'
-import { Badge } from '@/components/ui/badge'
+import { badgeVariants } from '@/components/ui/badge'
 import PageNotFound from './not-found'
 
 async function fetchTitle(titleId: string) {
@@ -63,9 +63,13 @@ function TitleInfo({
           <p className="pt-4">{title.description || 'No description.'}</p>
 
           <div className="flex gap-1 pt-4">
-            {title.tagNames.map((tagName) => (
-              <Link key={tagName} to={`/browse?tag=${tagName}`}>
-                <Badge variant="secondary">{tagName}</Badge>
+            {title.tags.map((tag) => (
+              <Link
+                key={tag.id}
+                to={`/browse?tag=${tag.id}`}
+                className={badgeVariants({ variant: 'secondary' })}
+              >
+                {tag.name}
               </Link>
             ))}
           </div>

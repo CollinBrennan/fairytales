@@ -14,8 +14,18 @@ import {
 
 export const titleRoute = new Hono()
   .get('/', async (c) => {
-    const { q: titleName, type: typeName, tag: tagName } = c.req.query()
-    const titles = await fetchTitlesByQuery(titleName, typeName, tagName)
+    const titleName = c.req.query('q')
+    const titleTypes = c.req.query('type')
+    const titleTags = c.req.query('tag')
+
+    console.log('types: ', titleTypes)
+    console.log('tags ', titleTags)
+
+    const titles = await fetchTitlesByQuery(
+      titleName,
+      titleTypes?.split(','),
+      titleTags?.split(',')
+    )
 
     return c.json({ titles })
   })
